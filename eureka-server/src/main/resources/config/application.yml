@@ -1,0 +1,23 @@
+server:
+  port: 8033
+
+spring:
+  application:
+    name: eureka-server
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+  server:
+    eviction-interval-timer-in-ms: 5000
+  client:
+    service-url:
+      defaultZone: http://localhost:${server.port}/eureka/
+
+logging:
+  level:
+    com:
+      netflix:
+        eureka: OFF
+        discovery: OFF

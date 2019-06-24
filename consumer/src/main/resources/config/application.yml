@@ -1,0 +1,86 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: consumer
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.cloud.client.ip-address}:${server.port}
+    # 服务过期时间配置,超过这个时间没有接收到心跳EurekaServer就会将这个实例剔除
+    lease-expiration-duration-in-seconds: 30
+    # 服务刷新时间配置，每隔这个时间会主动心跳一次
+    lease-renewal-interval-in-seconds: 10
+  client:
+    service-url:
+      defaultZone: http://localhost:8033/eureka/
+    healthcheck:
+      # 把 Eureka 客户端的健康检测交给 spring-boot-actuator 模块的 /health 端点，以实现更加全面的健康状态维护
+      enabled: true
+
+
+logging:
+  config: classpath:logback.xml
+
+# swagger2
+swagger:
+  enabled: true
+  title: ${spring.application.name} api
+  description: 接口
+  version: 1.0.0-SNAPSHOT
+  contact:
+    name: gege
+    email: lovegcp2010@163.com
+  base-package: com.example.demo.controller
+  base-path:
+    - /user/**
+
+#provider:
+#  ribbon:
+#    ConnectTimeout: 5000
+#    ReadTimeout: 10000
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+      provider:
+        connectTimeout: 5000
+        readTimeout: 1000
+  hystrix:
+    enabled: true
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 8000
+      fallback:
+        enabled: true
+    AccountClient#detail(AccountQueryRequest):
+      fallback:
+        enabled: true
+  threadpool:
+    default:
+      coreSize: 1
+      maximumSize: 1
+      queueSizeRejectionThreshold: 0
+    provider#RoleClient:
+      coreSize: 5
+      maximumSize: 5
+      queueSizeRejectionThreshold: 2
